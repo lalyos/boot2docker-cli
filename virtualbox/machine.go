@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net"
 	"os"
 	"path/filepath"
@@ -68,7 +69,7 @@ func init() {
 
 // Initialize the Machine.
 func InitFunc(mc *driver.MachineConfig) (driver.Machine, error) {
-	verbose = mc.Verbose
+	verbose = true
 
 	m, err := GetMachine(mc.VM)
 	if err != nil && mc.Init {
@@ -111,6 +112,8 @@ func (s *shareSlice) Set(shareDir string) error {
 // Add cmdline params for this driver
 func ConfigFlags(B2D *driver.MachineConfig, flags *flag.FlagSet) error {
 	//B2D.DriverCfg["virtualbox"] = cfg
+	log.Println("[HACK] virtualbox:ConfigFlags() called")
+	//debug.PrintStack()
 
 	flags.StringVar(&cfg.VMDK, "basevmdk", "", "Path to VMDK to use as base for persistent partition")
 

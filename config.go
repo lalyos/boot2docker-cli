@@ -75,24 +75,30 @@ func printConfig() string {
 
 // Read configuration from both profile and flags. Flags override profile.
 func config() (*flag.FlagSet, error) {
+	fmt.Println("[HACK] main::config()")
 	dir, err := cfgDir(".boot2docker")
 	if err != nil {
 		return nil, fmt.Errorf("failed to get boot2docker directory: %s", err)
 	}
 
+	fmt.Println("[HACK] os.Args[0]:", os.Args[0])
+
 	flags := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	flags.Usage = func() { usageLong(flags) }
 
+	fmt.Println("[HACK] main::config CALLS driver.ConfigFlags() ")
 	driver.ConfigFlags(&B2D, flags)
 
 	// Add the generic flags
 
 	flags.StringVar(&B2D.VM, "vm", "boot2docker-vm", "virtual machine name.")
+
 	// removed for now, requires re-parsing a new config file which is too messy
 	//flags.StringVarP(&B2D.Dir, "dir", "d", dir, "boot2docker config directory.")
 	B2D.Dir = dir
 	flags.StringVar(&B2D.ISOURL, "iso-url", "https://api.github.com/repos/boot2docker/boot2docker/releases", "source URL to provision the boot2docker ISO image.")
 	flags.StringVar(&B2D.ISO, "iso", filepath.Join(dir, "boot2docker.iso"), "path to boot2docker ISO image.")
+	fmt.Println("[HACK]B2D: ", B2D.ToShortString())
 
 	// Sven disabled this, as it is broken - if I user with a fresh computer downloads
 	// just the boot2docker-cli, and then runs `boot2docker --init ip`, we create a vm
@@ -104,6 +110,7 @@ func config() (*flag.FlagSet, error) {
 	flags.StringVar(&B2D.Driver, "driver", "virtualbox", "hypervisor driver.")
 	flags.StringVar(&B2D.SSH, "ssh", "ssh", "path to SSH client utility.")
 	flags.StringVar(&B2D.SSHGen, "ssh-keygen", "ssh-keygen", "path to ssh-keygen utility.")
+	fmt.Println("[HACK]B2D: ", B2D.ToShortString())
 
 	sshdir, _ := cfgDir(".ssh")
 	flags.StringVar(&B2D.SSHKey, "sshkey", filepath.Join(sshdir, "id_boot2docker"), "path to SSH key to use.")

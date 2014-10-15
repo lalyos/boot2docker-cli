@@ -2,8 +2,10 @@ package driver
 
 import (
 	"fmt"
-	flag "github.com/ogier/pflag"
+	"log"
 	"net"
+
+	flag "github.com/ogier/pflag"
 )
 
 // Machine config.
@@ -43,11 +45,17 @@ type MachineConfig struct {
 	DriverCfg map[string]interface{}
 }
 
+func (c *MachineConfig) ToShortString() string {
+	return fmt.Sprintf("MachineConfig[verb:%#v, driver:%#v, dir:%#v]", c.Verbose, c.Driver, c.Dir)
+}
+
 type ConfigFunc func(B2D *MachineConfig, flags *flag.FlagSet) error
 
 var configs map[string]ConfigFunc // optional map of driver ConfigFunc
 
 func init() {
+	log.SetFlags(log.Lshortfile | log.Ltime)
+	log.SetPrefix("[B2D] ")
 	configs = make(map[string]ConfigFunc)
 }
 
@@ -62,7 +70,10 @@ func RegisterConfig(driver string, configFunc ConfigFunc) error {
 }
 
 func ConfigFlags(B2D *MachineConfig, flags *flag.FlagSet) error {
-	for _, configFunc := range configs {
+
+	log.Println("[HACK] driver::ConfigFlags LENGTH of driver.configMap=", len(configs))
+	for key, configFunc := range configs {
+		log.Println("key", key)
 		if err := configFunc(B2D, flags); err != nil {
 			return err
 		}

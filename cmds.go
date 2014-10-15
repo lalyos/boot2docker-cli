@@ -387,6 +387,8 @@ func cmdSSH() error {
 		i++
 	}
 
+	fmt.Printf("[HACK] args=%#v \n", os.Args[i:])
+
 	if err := cmdInteractive(m, os.Args[i:]...); err != nil {
 		return fmt.Errorf("%s", err)
 	}
