@@ -350,3 +350,32 @@ func RequestCertsUsingSSH(m driver.Machine) (string, error) {
 	}
 	return certDir, nil
 }
+
+func getDaemonArgumentsUsingSSH(m driver.Machine) ([]string, error) {
+	cmd := getSSHCommand(m, "xargs -0 <  /proc/$(cat /var/run/docker.pid)/cmdline")
+
+	b, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+
+	out := string(b)
+	if B2D.Verbose {
+		fmt.Printf("SSH returned: %s\nEND SSH\n", out)
+	}
+	return strings.Split(out, " "), nil
+}
+
+func RequestTLSVerifyUsingSSH(m driver.Machine) (bool, error) {
+	args, err := getDaemonArgumentsUsingSSH(m)
+	if err != nil {
+		return false, err
+	}
+
+	for _, a := range args {
+		if a == "--tlsverify" {
+			return true, nil
+		}
+	}
+	return false, nil
+}
