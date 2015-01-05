@@ -3,7 +3,6 @@ package main
 import (
 	"archive/tar"
 	"bytes"
-	"fmt"
 	"log"
 	"strings"
 	"testing"
@@ -71,24 +70,9 @@ func getTarBtes() []byte {
 }
 
 func (f FakeSshCommander) GetSshCommand(m driver.Machine, args ...string) Outputer {
-	fmt.Println("[FAKE] SshCommander ...", args)
 	a := strings.Join(args, " ")
 	o := f.builtIns[a]
-	//fmt.Println("[FAKE] outputter: ...", o)
 	return o
-}
-
-func init() {
-	// fc.AddCmdOut(SSHCommGetTcp, `tcp://0.0.0.0:2375`)
-	// fc.AddCmdOut(SSHCommGetIp, `4: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
-	//   link/ether 08:00:27:8f:93:ba brd ff:ff:ff:ff:ff:ff
-	//   inet 192.168.59.103/24 brd 192.168.59.255 scope global eth1
-	//      valid_lft forever preferred_lft forever
-	//   inet6 fe80::a00:27ff:fe8f:93ba/64 scope link
-	//      valid_lft forever preferred_lft forever`)
-	//
-	// fc.AddCmdOut(SSHCommDaemonArgs, `/usr/local/bin/docker --tlsverify -d -D -g /var/lib/docker -H unix:// -H tcp://0.0.0.0:2375 -b=bridge0 --registry-mirror=http://192.168.1.111:5000`)
-
 }
 
 func TestRequestIPFromSSHFull(t *testing.T) {
@@ -195,13 +179,13 @@ func TestRequestCertsUsingSSH(t *testing.T) {
 	}
 }
 
-func TestRequestTLSVerifyUsingSSHNoTLS(t *testing.T) {
+func TestRequestTLSUsingSSHNoTLS(t *testing.T) {
 	fc := NewFakeSshCommander()
 	fc.AddCmdOut(SSHCommDaemonArgs, `/usr/local/bin/docker -d -D -g /var/lib/docker -H unix:// -H tcp://0.0.0.0:2375 -b=bridge0 --registry-mirror=http://192.168.1.111:5000`)
 	sshProvider = fc.GetSshCommand
 
 	m := getDummyMachine()
-	b, err := RequestTLSVerifyUsingSSH(m)
+	b, err := RequestTLSUsingSSH(m)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -216,7 +200,22 @@ func TestRequestTLSVerifyUsingSSHTLS(t *testing.T) {
 	sshProvider = fc.GetSshCommand
 
 	m := getDummyMachine()
-	b, err := RequestTLSVerifyUsingSSH(m)
+	b, err := RequestTLSUsingSSH(m)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !b {
+		t.Fatalf("Expected true got %b", b)
+	}
+}
+
+func TestRequestTLSUsingSSHTLS(t *testing.T) {
+	fc := NewFakeSshCommander()
+	fc.AddCmdOut(SSHCommDaemonArgs, `/usr/local/bin/docker --tls -d -D -g`)
+	sshProvider = fc.GetSshCommand
+
+	m := getDummyMachine()
+	b, err := RequestTLSUsingSSH(m)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -171,7 +171,7 @@ func cmdShellInit() error {
 		return fmt.Errorf("Error requesting socket: %s\n", err)
 	}
 
-	tlsVerify, err := RequestTLSVerifyUsingSSH(m)
+	tlsVerify, err := RequestTLSUsingSSH(m)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Warning: error getting tlsVerify: %s\n", err)
 	}

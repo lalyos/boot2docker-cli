@@ -400,7 +400,7 @@ func getDaemonArgumentsUsingSSH(m driver.Machine) ([]string, error) {
 	return strings.Split(out, " "), nil
 }
 
-func RequestTLSVerifyUsingSSH(m driver.Machine) (bool, error) {
+func RequestTLSUsingSSH(m driver.Machine) (bool, error) {
 	args, err := getDaemonArgumentsUsingSSH(m)
 	if err != nil {
 		return false, err
