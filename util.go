@@ -373,7 +373,7 @@ func RequestTLSVerifyUsingSSH(m driver.Machine) (bool, error) {
 	}
 
 	for _, a := range args {
-		if a == "--tlsverify" {
+		if a == "--tlsverify" || a == "--tls" {
 			return true, nil
 		}
 	}
